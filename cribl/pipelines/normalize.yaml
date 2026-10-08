@@ -1,0 +1,74 @@
+# Normalize Pipeline - normalize field names, add labels, flatten structure
+# Purpose: Standardize incoming data schema and add contextual metadata
+#
+# Functions:
+# 1. rename_fields - Map common field names to normalized schema
+# 2. add_labels - Extract team, service tier, and flag incomplete data
+# 3. flatten_structure - Convert nested objects to flat dot-notation fields
+
+functions:
+  - id: rename_fields
+    filter: "true"
+    disabled: false
+    type: eval
+    conf:
+      add:
+        _raw: "JSON.stringify(__e)"
+      remove: []
+      keep:
+        - host
+        - hostname
+        - server
+        - service
+        - service_name
+        - environment
+        - env
+        - namespace
+        - priority
+        - severity
+        - level
+        - message
+        - timestamp
+        - _time
+        - _raw
+      fields:
+        host: "__e['host'] || __e['hostname'] || __e['server'] || 'unknown'"
+        service: "__e['service'] || __e['service_name'] || __e['service.name'] || 'unknown'"
+        environment: "__e['environment'] || __e['env'] || 'production'"
+        namespace: "__e['namespace'] || 'default'"
+        source_type: "'cribl_normalized'"
+
+  - id: add_labels
+    filter: "true"
+    disabled: false
+    type: eval
+    conf:
+      add: {}
+      remove: []
+      keep:
+        - "*.host"
+        - "*.service"
+        - "*.environment"
+        - "*.namespace"
+        - "*.source_type"
+        - "*.priority"
+        - "*.severity"
+        - "*.message"
+        - "*.team"
+        - "*.service_tier"
+        - "*.missing_labels"
+      fields:
+        team: "(__e['namespace'] || 'unknown').split('-')[0] || 'platform'"
+        service_tier: "(__e['priority'] || 0) > 7 ? 'critical' : (__e['priority'] || 0) > 4 ? 'standard' : 'best-effort'"
+        missing_labels: "(!__e['host'] || !__e['service'] || !__e['environment']) ? ['incomplete_metadata'] : []"
+
+  - id: flatten_structure
+    filter: "true"
+    disabled: false
+    type: flatten
+    conf:
+      depth: 10
+      separator: "."
+      leavesOnly: false
+
+description: "Normalize field names, add labels, flatten structure for uniform schema"

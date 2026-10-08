@@ -1,0 +1,134 @@
+# ========================================
+# DAY 4: LOG GENERATOR DEPLOYMENTS
+# ========================================
+
+---
+# Payments Service Log Generator
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-log-generator
+  namespace: payments
+  labels:
+    app: payments-log-gen
+    tier: critical
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: payments-log-gen
+  template:
+    metadata:
+      labels:
+        app: payments-log-gen
+        namespace: payments
+    spec:
+      containers:
+      - name: log-generator
+        image: busybox:latest
+        command:
+          - /bin/sh
+          - -c
+          - |
+            while true; do
+              LEVEL=$(shuf -e "INFO" "WARN" "ERROR" "DEBUG" -n 1)
+              MESSAGE="[$(date +'%Y-%m-%dT%H:%M:%SZ')] $LEVEL Transaction processed for customer. severity=$LEVEL namespace=payments appId=payment-service msg='Payment processed successfully' source=payment-svc"
+              echo "$MESSAGE"
+              sleep $((RANDOM % 5 + 1))
+            done
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+
+---
+# Checkout Service Log Generator
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-log-generator
+  namespace: checkout
+  labels:
+    app: checkout-log-gen
+    tier: critical
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: checkout-log-gen
+  template:
+    metadata:
+      labels:
+        app: checkout-log-gen
+        namespace: checkout
+    spec:
+      containers:
+      - name: log-generator
+        image: busybox:latest
+        command:
+          - /bin/sh
+          - -c
+          - |
+            while true; do
+              LEVEL=$(shuf -e "INFO" "WARN" "ERROR" "DEBUG" "FATAL" -n 1)
+              MESSAGE="[$(date +'%Y-%m-%dT%H:%M:%SZ')] $LEVEL Cart validated and checkout started. severity=$LEVEL namespace=checkout appId=checkout-service msg='Checkout process initiated' source=checkout-svc"
+              echo "$MESSAGE"
+              sleep $((RANDOM % 5 + 1))
+            done
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+
+---
+# Unknown Team Service Log Generator
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unknown-team-log-generator
+  namespace: unknown-team
+  labels:
+    app: unknown-log-gen
+    tier: standard
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: unknown-log-gen
+  template:
+    metadata:
+      labels:
+        app: unknown-log-gen
+        namespace: unknown-team
+    spec:
+      containers:
+      - name: log-generator
+        image: busybox:latest
+        command:
+          - /bin/sh
+          - -c
+          - |
+            while true; do
+              LEVEL=$(shuf -e "INFO" "DEBUG" "WARN" -n 1)
+              TIMESTAMP=$(date +'%Y-%m-%dT%H:%M:%SZ')
+              # Generate JSON structured logs
+              JSON="{\"timestamp\":\"$TIMESTAMP\",\"level\":\"$LEVEL\",\"namespace\":\"unknown-team\",\"appId\":\"legacy-service\",\"message\":\"Processing request\",\"severity\":\"$LEVEL\",\"source\":\"legacy-app\",\"trace_id\":\"$(head -c 16 /dev/urandom | od -An -tx1 | tr -d ' ')\"}"
+              echo "$JSON"
+              sleep $((RANDOM % 5 + 1))
+            done
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi

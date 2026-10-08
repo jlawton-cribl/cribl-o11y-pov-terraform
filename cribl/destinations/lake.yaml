@@ -1,0 +1,79 @@
+# Cribl Lake Destination - Native Cribl storage
+# Purpose: Enable real-time querying and exploration of observability data
+#
+# Route strategy: Full dataset goes to Lake for comprehensive search/analysis
+
+type: cribl_lake
+description: "Cribl Lake - native query engine for observability data exploration"
+
+database: pov_logs
+table: observability_events
+
+partitioning:
+  enabled: true
+  fields:
+    - name: year
+      value: "%Y"
+    - name: month
+      value: "%m"
+    - name: day
+      value: "%d"
+    - name: environment
+      value: "__e.environment || 'unknown'"
+
+columnSettings:
+  - name: timestamp
+    type: timestamp
+    nullable: false
+  - name: severity
+    type: string
+    nullable: true
+  - name: level
+    type: string
+    nullable: true
+  - name: service
+    type: string
+    nullable: true
+  - name: host
+    type: string
+    nullable: true
+  - name: environment
+    type: string
+    nullable: true
+  - name: namespace
+    type: string
+    nullable: true
+  - name: team
+    type: string
+    nullable: true
+  - name: service_tier
+    type: string
+    nullable: true
+  - name: message
+    type: string
+    nullable: true
+  - name: _cribl_processed
+    type: timestamp
+    nullable: true
+
+batch:
+  enabled: true
+  size: 100
+  timeout: 30s
+
+compression: snappy
+
+rowGroupSize: 128
+
+objectMetadata:
+  project: "cribl-o11y-pov"
+  purpose: "observability-search"
+  retention_days: 90
+
+acknowledgment:
+  enabled: true
+  timeout: 30s
+
+schema:
+  autoDetect: true
+  allowSchemaEvolution: true

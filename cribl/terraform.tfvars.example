@@ -1,0 +1,31 @@
+# ========================================
+# Cribl Cloud Authentication
+# ========================================
+cribl_client_id       = "your-cribl-client-id"
+cribl_client_secret   = "your-cribl-client-secret"
+cribl_organization_id = "your-org-id"
+cribl_workspace_id    = "main"
+
+# ========================================
+# New Relic Configuration
+# ========================================
+nr_api_key     = "your-new-relic-api-key"
+nr_license_key = "your-new-relic-license-key"
+
+# ========================================
+# AWS/S3 Configuration
+# ========================================
+s3_bucket      = "cribl-o11y-pov-logs"
+s3_bucket_name = "cribl-o11y-pov-logs"
+s3_region      = "us-west-2"
+aws_region     = "us-west-2"
+
+# ========================================
+# Splunk HEC Configuration
+# ========================================
+hec_auth_token = "your-splunk-hec-token"
+
+# ========================================
+# Cribl Lake Configuration
+# ========================================
+lake_endpoint = "https://your-cribl-cloud-org.cribl.cloud/api/v1/lake"

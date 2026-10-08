@@ -1,0 +1,75 @@
+# Output Router Configuration
+# Purpose: Intelligently route normalized logs to appropriate destinations based on severity/context
+#
+# Routing strategy:
+# 1. ERROR/FATAL → New Relic (high priority, immediate visibility)
+# 2. INFO/DEBUG → S3 (economic storage, batch processing)
+# 3. ALL DATA → Cribl Lake (complete archive, searchable)
+
+outputRouter:
+  description: "Route normalized observability events to optimal destinations"
+  routes:
+    - id: route-errors-to-nr
+      name: "High-Priority Errors to New Relic"
+      filter: "__e.level === 'error' || __e.severity === 'ERROR' || __e.severity === 'FATAL' || __e.severity === 'CRITICAL'"
+      pipeline:
+        - normalize-labels
+        - structure-repair
+      destinations:
+        - newrelic-otlp
+      priority: 10
+      enabled: true
+      description: "Route critical/error/fatal logs to NR for immediate alerting"
+
+    - id: route-warnings-to-nr
+      name: "Warnings to New Relic"
+      filter: "__e.severity === 'WARN' || __e.severity === 'WARNING'"
+      pipeline:
+        - normalize-labels
+        - structure-repair
+      destinations:
+        - newrelic-otlp
+      priority: 20
+      enabled: true
+      description: "Route warnings to NR for visibility"
+
+    - id: route-info-debug-to-s3
+      name: "Info & Debug to S3"
+      filter: "__e.level === 'info' || __e.level === 'debug' || __e.severity === 'INFO' || __e.severity === 'DEBUG'"
+      pipeline:
+        - normalize-labels
+        - structure-repair
+        - volume-reduction
+      destinations:
+        - s3-parquet
+      priority: 30
+      enabled: true
+      description: "Route verbose logs to S3 for economic long-term storage"
+
+    - id: route-all-to-lake
+      name: "All Events to Cribl Lake"
+      filter: "true"
+      pipeline:
+        - normalize-labels
+        - structure-repair
+        - volume-reduction
+      destinations:
+        - cribl-lake
+      priority: 40
+      enabled: true
+      description: "Archive all processed events to Lake for historical analysis"
+
+    - id: route-default
+      name: "Default Route"
+      filter: "true"
+      pipeline:
+        - normalize-labels
+      destinations:
+        - newrelic-otlp
+      priority: 100
+      enabled: true
+      description: "Fallback route to ensure no events are dropped"
+
+maxPipelineDepth: 3
+processUnmatchedEvents: true
+failOnError: false

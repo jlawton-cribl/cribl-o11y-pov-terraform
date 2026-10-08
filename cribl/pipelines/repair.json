@@ -1,0 +1,49 @@
+{
+  "id": "structure-repair",
+  "description": "Repair multiline traces, normalize severity levels, parse JSON structures",
+  "functions": [
+    {
+      "id": "handle_multiline",
+      "filter": "__e['_raw']",
+      "disabled": false,
+      "type": "regex_extract",
+      "conf": {
+        "regex": "^(?<timestamp>\\d{4}-\\d{2}-\\d{2}T[\\d:\\.]+Z?)\\s+(?<severity>\\w+)\\s+(?<message>[\\s\\S]*)$",
+        "mode": "extract",
+        "overwrite": false
+      }
+    },
+    {
+      "id": "normalize_severity",
+      "filter": "__e['severity']",
+      "disabled": false,
+      "type": "eval",
+      "conf": {
+        "add": {},
+        "remove": [],
+        "keep": [],
+        "fields": {
+          "severity": "(__e['severity'] || 'INFO').toUpperCase()",
+          "level": "(function(){ const sev = (__e['severity'] || 'INFO').toUpperCase(); if (sev === 'ERROR' || sev === 'FATAL' || sev === 'CRITICAL') return 'error'; if (sev === 'WARN' || sev === 'WARNING') return 'warn'; if (sev === 'DEBUG') return 'debug'; return 'info'; })()"
+        }
+      }
+    },
+    {
+      "id": "parse_json",
+      "filter": "__e['message'] && __e['message'].startsWith('{')",
+      "disabled": false,
+      "type": "json_extract",
+      "conf": {
+        "source_field": "message",
+        "target_field": "__e"
+      }
+    },
+    {
+      "id": "filter_empty_messages",
+      "filter": "__e['message'] && __e['message'].length > 0",
+      "disabled": false,
+      "type": "filter",
+      "conf": {}
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "normalize-labels",
+  "description": "Normalize field names, add labels, flatten structure for uniform schema",
+  "functions": [
+    {
+      "id": "rename_fields",
+      "filter": "true",
+      "disabled": false,
+      "type": "eval",
+      "conf": {
+        "add": {
+          "_raw": "JSON.stringify(__e)"
+        },
+        "remove": [],
+        "keep": [],
+        "fields": {
+          "host": "__e['host'] || __e['hostname'] || __e['server'] || 'unknown'",
+          "service": "__e['service'] || __e['service_name'] || __e['service.name'] || 'unknown'",
+          "environment": "__e['environment'] || __e['env'] || 'production'",
+          "namespace": "__e['namespace'] || 'default'",
+          "source_type": "'cribl_normalized'"
+        }
+      }
+    },
+    {
+      "id": "add_labels",
+      "filter": "true",
+      "disabled": false,
+      "type": "eval",
+      "conf": {
+        "add": {},
+        "remove": [],
+        "keep": [],
+        "fields": {
+          "team": "(__e['namespace'] || 'unknown').split('-')[0] || 'platform'",
+          "service_tier": "(__e['priority'] || 0) > 7 ? 'critical' : (__e['priority'] || 0) > 4 ? 'standard' : 'best-effort'",
+          "missing_labels": "(!__e['host'] || !__e['service'] || !__e['environment']) ? ['incomplete_metadata'] : []"
+        }
+      }
+    },
+    {
+      "id": "flatten_structure",
+      "filter": "true",
+      "disabled": false,
+      "type": "flatten",
+      "conf": {
+        "depth": 10,
+        "separator": ".",
+        "leavesOnly": false
+      }
+    }
+  ]
+}

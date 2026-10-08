@@ -1,0 +1,4 @@
+namespace,team,service_tier
+payments,payments-team,critical
+checkout,checkout-team,critical
+unknown-team,unknown-team,standard

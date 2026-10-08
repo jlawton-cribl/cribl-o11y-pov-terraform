@@ -1,0 +1,61 @@
+# Repair Pipeline - handle multiline traces, extract severity, parse JSON
+# Purpose: Repair malformed or unstructured data for downstream processing
+#
+# Functions:
+# 1. handle_multiline - Extract timestamps, severity, and messages from unstructured logs
+# 2. normalize_severity - Standardize severity levels (uppercase, map to log levels)
+# 3. parse_json - Attempt to parse message field as JSON for enrichment
+
+functions:
+  - id: handle_multiline
+    filter: "__e['_raw']"
+    disabled: false
+    type: regex_extract
+    conf:
+      regex: '^(?<timestamp>\d{4}-\d{2}-\d{2}T[\d:\.]+Z?)\s+(?<severity>\w+)\s+(?<message>[\s\S]*)$'
+      mode: extract
+      overwrite: false
+      keep:
+        - timestamp
+        - severity
+        - message
+        - level
+
+  - id: normalize_severity
+    filter: "__e['severity']"
+    disabled: false
+    type: eval
+    conf:
+      add: {}
+      remove: []
+      keep:
+        - "*.severity"
+        - "*.level"
+      fields:
+        severity: "(__e['severity'] || 'INFO').toUpperCase()"
+        level: |
+          (function(){
+            const sev = (__e['severity'] || 'INFO').toUpperCase();
+            if (sev === 'ERROR' || sev === 'FATAL' || sev === 'CRITICAL') return 'error';
+            if (sev === 'WARN' || sev === 'WARNING') return 'warn';
+            if (sev === 'DEBUG') return 'debug';
+            return 'info';
+          })()
+
+  - id: parse_json
+    filter: "__e['message'] && __e['message'].startsWith('{')"
+    disabled: false
+    type: json_extract
+    conf:
+      source_field: message
+      target_field: __e
+      keep:
+        - "*"
+
+  - id: filter_empty_messages
+    filter: "__e['message'] && __e['message'].length > 0"
+    disabled: false
+    type: filter
+    conf: {}
+
+description: "Repair multiline traces, normalize severity levels, parse JSON structures"

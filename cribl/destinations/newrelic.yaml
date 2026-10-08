@@ -1,0 +1,62 @@
+# New Relic Destination - OTLP HTTP endpoint
+# Purpose: Send normalized and prioritized logs to New Relic for observability
+#
+# Route strategy: ERROR/FATAL/WARN logs go here with priority routing
+
+type: http_event_collector
+description: "New Relic OTLP HTTP ingest - for high-priority observability events"
+
+httpClientConfig:
+  url: "https://otlp.nr-data.net:4318/v1/logs"
+  method: POST
+  headers:
+    api-key: "${nr_api_key}"
+    "Content-Type": "application/json"
+    "User-Agent": "Cribl/O11y-POV"
+  tlsClientConfig:
+    insecureSkipVerify: false
+    minVersion: "1.2"
+  timeout: 30s
+  keepAliveInterval: 30s
+
+format:
+  type: json
+  pretty: false
+
+batch:
+  enabled: true
+  size: 1000
+  timeout: 5s
+
+compression:
+  enabled: true
+  type: gzip
+  level: 6
+
+retryPolicy:
+  maxRetries: 3
+  initialInterval: 1s
+  maxInterval: 30s
+  multiplier: 2
+
+acknowledgment:
+  enabled: true
+  timeout: 5s
+
+fieldMappings:
+  - source: "timestamp"
+    target: "timestamp"
+  - source: "severity"
+    target: "severity"
+  - source: "service"
+    target: "service.name"
+  - source: "host"
+    target: "host.name"
+  - source: "environment"
+    target: "attributes.environment"
+  - source: "team"
+    target: "attributes.team"
+  - source: "namespace"
+    target: "attributes.namespace"
+  - source: "message"
+    target: "message"

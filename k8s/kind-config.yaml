@@ -1,0 +1,44 @@
+# ========================================
+# DAY 4: KIND CLUSTER CONFIGURATION
+# ========================================
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: cribl-o11y-pov
+kubeProxyMode: "iptables"
+
+# Node configuration: 1 control-plane + 3 workers
+nodes:
+  # Control Plane Node
+  - role: control-plane
+    image: kindest/node:v1.36.0@sha256:8c7d0f8e32f3dd2d7c7d5b6c7c5b6c7c5b6c7c5b6c7c5b6c7c5b6c7c5b6c7c
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            system-reserved: "cpu=100m,memory=100Mi"
+            kube-reserved: "cpu=100m,memory=100Mi"
+
+  # Worker Node 1
+  - role: worker
+    image: kindest/node:v1.36.0@sha256:8c7d0f8e32f3dd2d7c7d5b6c7c5b6c7c5b6c7c5b6c7c5b6c7c5b6c7c5b6c7c
+
+  # Worker Node 2
+  - role: worker
+    image: kindest/node:v1.36.0@sha256:8c7d0f8e32f3dd2d7c7d5b6c7c5b6c7c5b6c7c5b6c7c5b6c7c5b6c7c5b6c7c
+
+  # Worker Node 3
+  - role: worker
+    image: kindest/node:v1.36.0@sha256:8c7d0f8e32f3dd2d7c7d5b6c7c5b6c7c5b6c7c5b6c7c5b6c7c5b6c7c5b6c7c
+
+networking:
+  apiServerAddress: "127.0.0.1"
+  apiServerPort: 6443
+  podSubnet: "10.244.0.0/16"
+  serviceSubnet: "10.96.0.0/12"
+
+containerdConfigPatches:
+  - |-
+    [plugins."io.containerd.grpc.v1.cri"]
+      sandbox_image = "kindest/pause:3.9"

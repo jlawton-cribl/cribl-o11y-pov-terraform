@@ -1,0 +1,57 @@
+# S3 Destination - Parquet format for long-term archive
+# Purpose: Store normalized logs in S3 for long-term retention and cost optimization
+#
+# Route strategy: INFO/DEBUG logs go here for economic storage
+
+type: s3
+description: "S3 Parquet archive - long-term storage for observability data"
+
+bucketName: "${s3_bucket}"
+region: "${s3_region}"
+prefix: "cribl-o11y-pov/logs"
+path: "year=%Y/month=%m/day=%d/hour=%H"
+
+compression: snappy
+format: parquet
+
+batch:
+  enabled: true
+  size: 50
+  timeout: 60s
+
+fileNaming:
+  pattern: "events_%Y%m%d_%H%M%S_%(_rc)s.parquet"
+  dynamicPath: true
+
+credentials:
+  useIAM: false
+  accessKeyId: "CONFIGURE_VIA_ENV_OR_CREDS"
+  secretAccessKey: "CONFIGURE_VIA_ENV_OR_CREDS"
+
+partitioning:
+  enabled: true
+  fields:
+    - name: year
+      value: "%Y"
+    - name: month
+      value: "%m"
+    - name: day
+      value: "%d"
+    - name: hour
+      value: "%H"
+
+objectMetadata:
+  tags:
+    project: "cribl-o11y-pov"
+    purpose: "observability-archive"
+    environment: "production"
+
+retryPolicy:
+  maxRetries: 5
+  initialInterval: 1s
+  maxInterval: 60s
+  multiplier: 2
+
+acknowledgment:
+  enabled: true
+  timeout: 30s

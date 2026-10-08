@@ -1,0 +1,41 @@
+# ========================================
+# DAY 4: KUBERNETES NAMESPACES
+# ========================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: payments
+  labels:
+    name: payments
+    team: payments-team
+    tier: critical
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: checkout
+  labels:
+    name: checkout
+    team: checkout-team
+    tier: critical
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: unknown-team
+  labels:
+    name: unknown-team
+    team: unknown-team
+    tier: standard
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: logging
+  labels:
+    name: logging
+    app: logging-infrastructure

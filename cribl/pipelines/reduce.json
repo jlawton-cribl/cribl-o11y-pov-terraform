@@ -1,0 +1,52 @@
+{
+  "id": "volume-reduction",
+  "description": "Reduce volume by filtering noise, applying dynamic sampling, and optimizing for storage",
+  "functions": [
+    {
+      "id": "filter_debug_prod",
+      "filter": "(__e['environment'] === 'prod' || __e['environment'] === 'production') && (__e['severity'] === 'DEBUG' || __e['severity'] === 'debug')",
+      "disabled": false,
+      "type": "drop",
+      "conf": {}
+    },
+    {
+      "id": "filter_info_prod",
+      "filter": "(__e['environment'] === 'prod' || __e['environment'] === 'production') && (__e['severity'] === 'INFO' && __e['message'] && __e['message'].match(/health|heartbeat|ping|keepalive/i))",
+      "disabled": false,
+      "type": "drop",
+      "conf": {}
+    },
+    {
+      "id": "drop_empty",
+      "filter": "!__e['message'] || __e['message'].length === 0 || __e['message'] === 'null'",
+      "disabled": false,
+      "type": "drop",
+      "conf": {}
+    },
+    {
+      "id": "dynamic_sampling",
+      "filter": "(__e['severity'] === 'DEBUG' || __e['severity'] === 'INFO')",
+      "disabled": false,
+      "type": "sample",
+      "conf": {
+        "rate": 0.1,
+        "seed": "__e['namespace']"
+      }
+    },
+    {
+      "id": "add_processing_metadata",
+      "filter": "true",
+      "disabled": false,
+      "type": "eval",
+      "conf": {
+        "add": {
+          "_cribl_processed": "new Date().toISOString()",
+          "_volume_reduced": "true"
+        },
+        "remove": [],
+        "keep": [],
+        "fields": {}
+      }
+    }
+  ]
+}
