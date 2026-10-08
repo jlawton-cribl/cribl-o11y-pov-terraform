@@ -40,24 +40,24 @@ output "newrelic_dashboard_link" {
 output "deployment_summary" {
   description = "Complete deployment summary"
   value = {
-    org_url                  = "https://main-${var.cribl_organization_id}.cribl.cloud"
-    group_id                 = criblio_group.cribl_o11y_pov.id
-    workspace                = var.cribl_workspace_id
-    pipelines_count          = 3
-    destinations_count       = 4
-    routes_count             = 3
-    hec_port                 = 8088
-    tls_version              = "1.3"
-    s3_region                = var.aws_region
-    kubernetes_namespaces    = 4
-    kubernetes_deployments   = 3
+    org_url                = "https://main-${var.cribl_organization_id}.cribl.cloud"
+    group_id               = criblio_group.cribl_o11y_pov.id
+    workspace              = var.cribl_workspace_id
+    pipelines_count        = 3
+    destinations_count     = 4
+    routes_count           = 3
+    hec_port               = 8088
+    tls_version            = "1.3"
+    s3_region              = var.aws_region
+    kubernetes_namespaces  = 4
+    kubernetes_deployments = 3
   }
 }
 
 output "configuration_info" {
   description = "Configuration details for reference"
   value = {
-    provider_version  = "~> 1.25"
+    provider_version = "~> 1.25"
     pipelines = {
       normalize = "normalize-and-label"
       repair    = "structure-repair"
@@ -80,9 +80,9 @@ output "configuration_info" {
 output "troubleshooting_resources" {
   description = "Links to troubleshooting and documentation"
   value = {
-    cribl_docs           = "https://docs.cribl.io"
-    cribl_api_reference  = "https://docs.cribl.io/stream/api-reference"
-    lesson_plan          = "~/cribl-o11y-pov/lesson-plan/"
-    terraform_docs       = "https://registry.terraform.io/providers/criblio/criblio/latest/docs"
+    cribl_docs          = "https://docs.cribl.io"
+    cribl_api_reference = "https://docs.cribl.io/stream/api-reference"
+    lesson_plan         = "~/cribl-o11y-pov/lesson-plan/"
+    terraform_docs      = "https://registry.terraform.io/providers/criblio/criblio/latest/docs"
   }
 }

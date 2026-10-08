@@ -8,8 +8,8 @@ resource "criblio_routes" "main_routes" {
   content = jsonencode({
     routes = [
       {
-        name     = "errors-to-newrelic"
-        filter   = "level === 'error' || level === 'fatal'"
+        name   = "errors-to-newrelic"
+        filter = "level === 'error' || level === 'fatal'"
         pipelineIds = [
           criblio_pipeline.normalize_and_label.pipeline_id
         ]
@@ -20,8 +20,8 @@ resource "criblio_routes" "main_routes" {
         disabled = false
       },
       {
-        name     = "info-debug-to-s3-lake"
-        filter   = "level === 'info' || level === 'debug'"
+        name   = "info-debug-to-s3-lake"
+        filter = "level === 'info' || level === 'debug'"
         pipelineIds = [
           criblio_pipeline.volume_reduction.pipeline_id
         ]
@@ -33,8 +33,8 @@ resource "criblio_routes" "main_routes" {
         disabled = false
       },
       {
-        name     = "default-to-newrelic"
-        filter   = "true"
+        name   = "default-to-newrelic"
+        filter = "true"
         pipelineIds = [
           criblio_pipeline.structure_repair.pipeline_id
         ]

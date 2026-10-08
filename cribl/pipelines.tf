@@ -14,8 +14,8 @@ resource "criblio_pipeline" "normalize_and_label" {
     disabled    = false
     functions = [
       {
-        id  = "normalize_eval"
-        type = "eval"
+        id       = "normalize_eval"
+        type     = "eval"
         disabled = false
         conf = {
           add = [
@@ -26,8 +26,8 @@ resource "criblio_pipeline" "normalize_and_label" {
         }
       },
       {
-        id  = "namespace_lookup"
-        type = "lookup"
+        id       = "namespace_lookup"
+        type     = "lookup"
         disabled = false
         conf = {
           lookupTableId = "namespace-team-mapping"
@@ -36,15 +36,15 @@ resource "criblio_pipeline" "normalize_and_label" {
             namespace = "namespace"
           }
           outputFields = {
-            team          = "team"
-            service_tier  = "service_tier"
+            team         = "team"
+            service_tier = "service_tier"
           }
           preserveNullMatch = true
         }
       },
       {
-        id  = "tag_missing_labels"
-        type = "eval"
+        id       = "tag_missing_labels"
+        type     = "eval"
         disabled = false
         conf = {
           add = [
@@ -74,11 +74,11 @@ resource "criblio_pipeline" "structure_repair" {
     disabled    = false
     functions = [
       {
-        id  = "extract_severity"
-        type = "regex"
+        id       = "extract_severity"
+        type     = "regex"
         disabled = false
         conf = {
-          source = "message"
+          source  = "message"
           pattern = "(?i)(ERROR|WARN|INFO|DEBUG|FATAL|TRACE)"
           outputFields = {
             level = "$1"
@@ -86,8 +86,8 @@ resource "criblio_pipeline" "structure_repair" {
         }
       },
       {
-        id  = "parse_multiline_json"
-        type = "serde"
+        id       = "parse_multiline_json"
+        type     = "serde"
         disabled = false
         conf = {
           source = "message"
@@ -96,8 +96,8 @@ resource "criblio_pipeline" "structure_repair" {
         }
       },
       {
-        id  = "normalize_timestamp_level"
-        type = "eval"
+        id       = "normalize_timestamp_level"
+        type     = "eval"
         disabled = false
         conf = {
           add = [
@@ -127,16 +127,16 @@ resource "criblio_pipeline" "volume_reduction" {
     disabled    = false
     functions = [
       {
-        id  = "drop_debug_in_prod"
-        type = "drop"
+        id       = "drop_debug_in_prod"
+        type     = "drop"
         disabled = false
         conf = {
           filter = "level === 'DEBUG' && environment === 'prod'"
         }
       },
       {
-        id  = "logarithmic_sampling"
-        type = "sample"
+        id       = "logarithmic_sampling"
+        type     = "sample"
         disabled = false
         conf = {
           mode    = "logarithmic"
@@ -145,8 +145,8 @@ resource "criblio_pipeline" "volume_reduction" {
         }
       },
       {
-        id  = "drop_empty_messages"
-        type = "drop"
+        id       = "drop_empty_messages"
+        type     = "drop"
         disabled = false
         conf = {
           filter = "!message || message === ''"

@@ -8,12 +8,12 @@ resource "criblio_destination" "new_relic" {
   description    = "New Relic log ingestion endpoint"
 
   content = jsonencode({
-    id          = "new-relic-logs"
-    type        = "newrelic"
-    disabled    = false
-    apiKey      = var.nr_license_key
+    id           = "new-relic-logs"
+    type         = "newrelic"
+    disabled     = false
+    apiKey       = var.nr_license_key
     messageField = "message"
-    batchSize   = 1000
+    batchSize    = 1000
     batchTimeout = "5s"
     tlsClientConfig = {
       insecureSkipVerify = false
@@ -32,17 +32,17 @@ resource "criblio_destination" "s3_parquet" {
   description    = "S3 Parquet storage with Snappy compression"
 
   content = jsonencode({
-    id          = "s3-parquet-logs"
-    type        = "output_s3"
-    disabled    = false
-    bucketName  = var.s3_bucket_name
-    region      = var.aws_region
-    prefix      = "o11y-pov"
+    id            = "s3-parquet-logs"
+    type          = "output_s3"
+    disabled      = false
+    bucketName    = var.s3_bucket_name
+    region        = var.aws_region
+    prefix        = "o11y-pov"
     partitionPath = "o11y-pov/YYYY/MM/DD"
-    compression = "snappy"
-    format      = "parquet"
-    batchSize   = 50
-    batchTimeout = "60s"
+    compression   = "snappy"
+    format        = "parquet"
+    batchSize     = 50
+    batchTimeout  = "60s"
     s3ClientConfig = {
       sseAlgorithm = "AES256"
     }
@@ -59,12 +59,12 @@ resource "criblio_destination" "cribl_lake" {
   description    = "Cribl Lake data archival"
 
   content = jsonencode({
-    id          = "cribl-lake-logs"
-    type        = "output_cribl_lake"
-    disabled    = false
-    endpoint    = var.lake_endpoint
-    format      = "parquet"
-    batchSize   = 100
+    id           = "cribl-lake-logs"
+    type         = "output_cribl_lake"
+    disabled     = false
+    endpoint     = var.lake_endpoint
+    format       = "parquet"
+    batchSize    = 100
     batchTimeout = "30s"
     tlsClientConfig = {
       insecureSkipVerify = false
@@ -89,8 +89,8 @@ resource "criblio_destination" "output_router" {
 
     routes = [
       {
-        name     = "Route 1: Errors to New Relic"
-        filter   = "level === 'error' || level === 'fatal'"
+        name   = "Route 1: Errors to New Relic"
+        filter = "level === 'error' || level === 'fatal'"
         destinations = [
           {
             id       = "new-relic-logs"
@@ -99,8 +99,8 @@ resource "criblio_destination" "output_router" {
         ]
       },
       {
-        name     = "Route 2: Info and Debug to S3 and Lake"
-        filter   = "level === 'info' || level === 'debug'"
+        name   = "Route 2: Info and Debug to S3 and Lake"
+        filter = "level === 'info' || level === 'debug'"
         destinations = [
           {
             id       = "s3-parquet-logs"
@@ -113,8 +113,8 @@ resource "criblio_destination" "output_router" {
         ]
       },
       {
-        name     = "Route 3: Default to New Relic"
-        filter   = "true"
+        name   = "Route 3: Default to New Relic"
+        filter = "true"
         destinations = [
           {
             id       = "new-relic-logs"

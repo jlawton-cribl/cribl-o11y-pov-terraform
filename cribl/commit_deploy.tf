@@ -32,10 +32,10 @@ resource "criblio_config_version" "pov_version" {
 }
 
 resource "criblio_deploy" "pov_deploy" {
-  group_id              = criblio_group.cribl_o11y_pov.id
-  message               = "O11y POV production deployment"
-  config_version_id     = criblio_config_version.pov_version.id
-  auto_activate         = true
+  group_id          = criblio_group.cribl_o11y_pov.id
+  message           = "O11y POV production deployment"
+  config_version_id = criblio_config_version.pov_version.id
+  auto_activate     = true
 
   depends_on = [
     criblio_config_version.pov_version

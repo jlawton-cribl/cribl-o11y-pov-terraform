@@ -3,9 +3,9 @@
 # ========================================
 
 resource "criblio_lookup_file" "namespace_team_map" {
-  group_id     = criblio_group.cribl_o11y_pov.id
-  lookup_id    = "namespace-team-mapping"
-  description  = "Map Kubernetes namespaces to team names and service tiers"
+  group_id    = criblio_group.cribl_o11y_pov.id
+  lookup_id   = "namespace-team-mapping"
+  description = "Map Kubernetes namespaces to team names and service tiers"
 
   content = file("${path.module}/data/namespace_team_map.csv")
 
