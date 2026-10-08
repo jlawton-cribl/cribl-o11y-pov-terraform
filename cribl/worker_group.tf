@@ -1,16 +1,20 @@
-resource "criblio_group" "demo-group-4" {
-  id                   = "demo-group-4"
+# ========================================
+# DAY 1: WORKER GROUP
+# ========================================
+
+resource "criblio_group" "cribl_o11y_pov" {
+  id                   = "cribl-o11y-pov"
   product              = "stream"
-  name                 = "demo-group-4"
-  on_prem              = "false"
-  is_fleet             = "false"
-  worker_remote_access = "true"
-  description          = "This is the worker group for the POV"
+  name                 = "cribl-o11y-pov"
+  on_prem              = false
+  is_fleet             = false
+  worker_remote_access = true
+  description          = "Observability POV worker group for data normalization, repair, and reduction"
 
   cloud = {
     provider = "aws"
     region   = "us-west-2"
   }
 
-  estimated_ingest_rate = "2048"
+  estimated_ingest_rate = 2048
 }
