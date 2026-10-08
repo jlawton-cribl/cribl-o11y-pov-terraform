@@ -1,0 +1,8 @@
+cribl_client_id       = "UVPUEiFSTUgKTT1p3tjEGNwaRw86CUIu"
+cribl_client_secret   = "xHBhjwiJWdLpD_oTcTWCMKS_XrChDB4YvMB_AcXAPGNn-FTmhDsK_GUsPU-YKiUP"
+cribl_organization_id = "lucid-solomon-w2cg0xb"
+cribl_workspace_id    = "main"
+nr_api_key            = "e46defbc16b6ae5b38a096c8df6512b6a358NRAL"
+hec_auth_token        = "640fb716-5a5e-4474-8053-e8e96f2c2c0c"
+s3_bucket             = "pov-bucket-62906"
+s3_region             = "us-west-2"

@@ -39,4 +39,10 @@ variable "s3_region" {
   default     = "us-west-2"
 }
 
+variable "hec_auth_token" {
+  description = "Splunk HEC authentication token"
+  type        = string
+  sensitive   = true
+}
+
 

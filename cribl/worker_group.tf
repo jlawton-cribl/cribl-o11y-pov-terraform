@@ -3,13 +3,13 @@
 # ========================================
 
 resource "criblio_group" "cribl_o11y_pov" {
-  id                   = "cribl-o11y-pov"
+  id                   = "demo-group-4"
   product              = "stream"
-  name                 = "cribl-o11y-pov"
+  name                 = "demo-group-4"
   on_prem              = false
   is_fleet             = false
   worker_remote_access = true
-  description          = "Observability POV worker group for data normalization, repair, and reduction"
+  description          = "Observability POV worker group for data normalization, repair, and reduction (demo-group-4)"
 
   cloud = {
     provider = "aws"

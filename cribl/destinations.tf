@@ -5,13 +5,13 @@
 resource "criblio_destination" "new_relic" {
   group_id       = criblio_group.cribl_o11y_pov.id
   destination_id = "new-relic-logs"
-  description    = "New Relic log ingestion endpoint"
+  description    = "New Relic log ingestion endpoint (demo-group-3 key)"
 
   content = jsonencode({
     id           = "new-relic-logs"
     type         = "newrelic"
     disabled     = false
-    apiKey       = var.nr_license_key
+    apiKey       = var.nr_api_key
     messageField = "message"
     batchSize    = 1000
     batchTimeout = "5s"
@@ -29,17 +29,17 @@ resource "criblio_destination" "new_relic" {
 resource "criblio_destination" "s3_parquet" {
   group_id       = criblio_group.cribl_o11y_pov.id
   destination_id = "s3-parquet-logs"
-  description    = "S3 Parquet storage with Snappy compression"
+  description    = "S3 Parquet storage with gzip compression (demo-group-3 bucket)"
 
   content = jsonencode({
     id            = "s3-parquet-logs"
     type          = "output_s3"
     disabled      = false
-    bucketName    = var.s3_bucket_name
-    region        = var.aws_region
-    prefix        = "o11y-pov"
-    partitionPath = "o11y-pov/YYYY/MM/DD"
-    compression   = "snappy"
+    bucketName    = var.s3_bucket
+    region        = var.s3_region
+    prefix        = "gogen-demo"
+    partitionPath = "gogen-demo/source_type/YYYY/MM/DD/HH"
+    compression   = "gzip"
     format        = "parquet"
     batchSize     = 50
     batchTimeout  = "60s"
